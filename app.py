@@ -1,11 +1,11 @@
 import streamlit as st
-import google.generativeai as genai
+import google.genai as genai
+import google.genai.types as genai_types
 import json
 
 # 1. SETUP
 # We access the "Secret Safe" using st.secrets
-genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-flash-latest')
+client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
 
 # 2. WEBSITE TITLE
 st.title("🤖 My AI Assistant")
@@ -21,9 +21,12 @@ if st.button("Generate Answer"):
             # Show a spinner while loading
             with st.spinner("Thinking..."):
                 # Get response
-                response = model.generate_content(
-                    user_prompt,
-                    generation_config={"response_mime_type": "application/json"}
+                response = client.models.generate_content(
+                    model="gemini-2.0-flash",
+                    contents=user_prompt,
+                    config=genai_types.GenerateContentConfig(
+                        response_mime_type="application/json"
+                    ),
                 )
                 
                 # Convert to Python Object
